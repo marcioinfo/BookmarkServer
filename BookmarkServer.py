@@ -44,6 +44,7 @@
 import http.server
 import requests
 from urllib.parse import unquote, parse_qs
+import os
 
 memory = {}
 
@@ -97,9 +98,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
                 self.send_response(303)
                 self.send_header('Location', memory[name])
                 self.end_headers()
-                # 2. Send a 303 redirect to the long URI in memory[name].
-                #    Delete the following line.
-                #  raise NotImplementedError("Step 2 isn't written yet.")
+
             else:
                 # We don't know that name! Send a 404 error.
                 self.send_response(404)
@@ -128,8 +127,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
             self.wfile.write("Missing form fields!".encode())
-            # 3. Serve a 400 error with a useful message.
-            #    Delete the following line.
+
             raise NotImplementedError("Step 3 isn't written yet!")
 
         longuri = params["longuri"][0]
@@ -142,9 +140,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             self.send_response(303)
             self.send_header('Location', '/')
             self.end_headers()
-            # 4. Serve a redirect to the root page (the form).
-            #    Delete the following line.
-            # raise NotImplementedError("Step 4 isn't written yet!")
+
         else:
             # Didn't successfully fetch the long URI.
             self.send_response(404)
@@ -154,6 +150,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    server_address = ('', 8000)
+    port = int(os.environ.get('PORT', 8000))   # Use PORT if it's there.
+    server_address = ('', port)
     httpd = http.server.HTTPServer(server_address, Shortener)
     httpd.serve_forever()
